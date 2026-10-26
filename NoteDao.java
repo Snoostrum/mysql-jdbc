@@ -1,3 +1,5 @@
+//与数据库交互
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -22,6 +24,24 @@ public class NoteDao {
                 list.add(note);
             }
             return list;
+        }
+    }
+
+    public Note findById(int id) throws SQLException, IOException {
+        String sql = "SELECT id, title, content FROM note WHERE id = ?";
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) {
+                    return null;
+                }
+                Note note = new Note();
+                note.setId(rs.getInt("id"));
+                note.setTitle(rs.getString("title"));
+                note.setContent(rs.getString("content"));
+                return note;
+            }
         }
     }
 

@@ -1,3 +1,4 @@
+//整条笔记
 public class Note {
                 private int id;
                 private String title;

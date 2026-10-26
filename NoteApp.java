@@ -1,3 +1,5 @@
+//与用户交互
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -9,7 +11,7 @@ public class NoteApp {
     public static void main(String[] args) {
         while (true) {
             System.out.println();
-            System.out.println("1.列出   2.新增   3.删除   4.修改   0.退出");
+            System.out.println("1.列出   2.新增   3.删除   4.修改   5.查看   0.退出");
             System.out.print("> ");
 
             try {
@@ -25,8 +27,10 @@ public class NoteApp {
                     delete();
                 } else if (choice.equals("4")) {
                     update();
+                } else if (choice.equals("5")) {
+                    view();
                 } else {
-                    System.out.println("没有这个选项");
+                    System.out.println("杂鱼你在输什么呢");
                 }
             } catch (SQLException e) {
                 System.err.println("数据库操作失败，请确认 MySQL 已启动后重试。详细信息: " + e.getMessage());
@@ -89,6 +93,18 @@ public class NoteApp {
             System.out.println("没有 id = " + id + " 这条");
         } else {
             System.out.println("将大局逆转吧");
+        }
+    }
+
+    private static void view() throws SQLException, IOException {
+        int id = readId("想看哪个呢~: ");
+        if (id == -1) return;
+
+        Note note = new NoteDao().findById(id);
+        if (note == null) {
+            System.out.println("没有 id = " + id + " 这条");
+        } else {
+            System.out.println(note.getId() + " | " + note.getTitle() + " | " + note.getContent());
         }
     }
 
