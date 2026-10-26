@@ -1,12 +1,14 @@
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class NoteDao {
 
-    public List<Note> findAll() throws Exception {
+    public List<Note> findAll() throws SQLException, IOException {
         String sql = "SELECT id, title, content FROM note ORDER BY id";
         try (Connection conn = Db.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -23,7 +25,7 @@ public class NoteDao {
         }
     }
 
-    public void add(Note note) throws Exception {
+    public void add(Note note) throws SQLException, IOException {
         String sql = "INSERT INTO note (title, content) VALUES (?, ?)";
         try (Connection conn = Db.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -33,7 +35,7 @@ public class NoteDao {
         }
     }
 
-    public int deleteById(int id) throws Exception {
+    public int deleteById(int id) throws SQLException, IOException {
         String sql = "DELETE FROM note WHERE id = ?";
         try (Connection conn = Db.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -42,7 +44,7 @@ public class NoteDao {
         }
     }
 
-    public int update(Note note) throws Exception {
+    public int update(Note note) throws SQLException, IOException {
         String sql = "UPDATE note SET title = ?, content = ? WHERE id = ?";
         try (Connection conn = Db.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

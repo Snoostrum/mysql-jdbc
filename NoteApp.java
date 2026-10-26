@@ -1,35 +1,43 @@
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Scanner;
 
 public class NoteApp {
     private static final Scanner sc = new Scanner(System.in);
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         while (true) {
             System.out.println();
             System.out.println("1.列出   2.新增   3.删除   4.修改   0.退出");
             System.out.print("> ");
 
-            String choice = sc.nextLine().trim();
+            try {
+                String choice = sc.nextLine().trim();
 
-            if (choice.equals("0")) {
-                break;
-            } else if (choice.equals("1")) {
-                list();
-            } else if (choice.equals("2")) {
-                add();
-            } else if (choice.equals("3")) {
-                delete();
-            } else if (choice.equals("4")) {
-                update();
-            } else {
-                System.out.println("没有这个选项");
+                if (choice.equals("0")) {
+                    break;
+                } else if (choice.equals("1")) {
+                    list();
+                } else if (choice.equals("2")) {
+                    add();
+                } else if (choice.equals("3")) {
+                    delete();
+                } else if (choice.equals("4")) {
+                    update();
+                } else {
+                    System.out.println("没有这个选项");
+                }
+            } catch (SQLException e) {
+                System.err.println("数据库操作失败，请确认 MySQL 已启动后重试。详细信息: " + e.getMessage());
+            } catch (IOException e) {
+                System.err.println("读取数据库配置失败，请检查 db.properties 文件后重试。详细信息: " + e.getMessage());
             }
         }
         System.out.println("加纳");
     }
 
-    private static void list() throws Exception {
+    private static void list() throws SQLException, IOException {
         NoteDao noteDao = new NoteDao();
         List<Note> notes = noteDao.findAll();
         for (Note note : notes) {
@@ -37,7 +45,7 @@ public class NoteApp {
         }
     }
 
-    private static void add() throws Exception {
+    private static void add() throws SQLException, IOException {
         System.out.print("标题: ");
         String title = sc.nextLine();
         System.out.print("内容: ");
@@ -50,21 +58,22 @@ public class NoteApp {
         System.out.println("OK啊也是直接添加成功了好吧");
     }
 
-    private static void delete() throws Exception {
-        System.out.print("要删的 id: ");
-        int id = Integer.parseInt(sc.nextLine().trim());
+    private static void delete() throws SQLException, IOException {
+        int id = readId("要删的 id: ");
+        if (id == -1) return;
 
         int rows = new NoteDao().deleteById(id);
         if (rows == 0) {
             System.out.println("没有 id = " + id + " 这条");
         } else {
-            System.out.println("OK啊也是直接删除了好吧");
+            System.out.println("真是无趣啊我大抵很快就会忘了你吧");
         }
     }
 
-    private static void update() throws Exception {
-        System.out.print("要改的 id: ");
-        int id = Integer.parseInt(sc.nextLine().trim());
+    private static void update() throws SQLException, IOException {
+        int id = readId("要改的 id: ");
+        if (id == -1) return;
+
         System.out.print("新的标题: ");
         String title = sc.nextLine();
         System.out.print("新的内容: ");
@@ -79,7 +88,22 @@ public class NoteApp {
         if (rows == 0) {
             System.out.println("没有 id = " + id + " 这条");
         } else {
-            System.out.println("OK啊也是直接修改了好吧");
+            System.out.println("将大局逆转吧");
+        }
+    }
+
+    private static int readId(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            String input = sc.nextLine().trim();
+            if (input.isEmpty()) {
+                return -1;
+            }
+            try {
+                return Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("请输入有效的数字 id，或直接回车取消。");
+            }
         }
     }
 }
